@@ -1,3 +1,5 @@
+require('dotenv').config({ path: '../.env' })
+
 import fastify from 'fastify'
 
 const app = fastify()

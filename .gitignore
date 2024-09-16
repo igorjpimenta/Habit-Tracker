@@ -3,3 +3,4 @@ bin/
 node_modules/
 .migrations/meta/
 server/.migrations/meta/
+**/.vscode/launch.json

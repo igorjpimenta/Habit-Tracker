@@ -3,6 +3,7 @@ require('dotenv').config({ path: '../.env' })
 import { createGoal } from '../functions/create-goal'
 import { getWeekPendingGoals } from '../functions/get-week-pending-goals'
 import { createGoalCompletion } from '../functions/create-goal-completion'
+import { getWeekSummary } from '../functions/get-week-summary'
 
 import fastify from 'fastify'
 import {
@@ -21,6 +22,12 @@ app.get('/pending-goals', async () => {
   const { pendingGoals } = await getWeekPendingGoals()
 
   return { pendingGoals }
+})
+
+app.get('/summary', async () => {
+  const { summary } = await getWeekSummary()
+
+  return { summary }
 })
 
 app.post(

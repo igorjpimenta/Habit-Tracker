@@ -30,6 +30,7 @@
 
 ## Tech Stack
 
+- **Frontend**: React, TypeScript, Tailwind CSS
 - **Backend**: Node.js (Fastify), TypeScript
 - **Database**: Postgres (managed using Drizzle ORM and running in Docker)
 - **Containerization**: Docker
@@ -82,6 +83,12 @@ To run the project locally, follow these steps:
     npm run seed
     ```
 
+7. **Install frontend dependencies**:
+    ```bash
+    cd ../frontend
+    npm install
+    ```
+
 ### Running the Application
 
 1. **Run the backend server**:
@@ -90,6 +97,13 @@ To run the project locally, follow these steps:
     npm run dev
     ```
     The backend server will start on `http://localhost:3333`.
+
+2. **Run the frontend development server**:
+    ```bash
+    cd ../frontend
+    npm run dev
+    ```
+    The frontend application will start on `http://localhost:5173`.
 
 ## Contributing
 We welcome contributions from the community! Here's how you can get involved:
@@ -125,7 +139,7 @@ We welcome contributions from the community! Here's how you can get involved:
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
-- Inspired by an event from Rocketseat, the main backend repo is available [here](https://github.com/rocketseat-education/nlw-pocket-js-node).
+- Inspired by an event from Rocketseat, the main backend repo is available [here](https://github.com/rocketseat-education/nlw-pocket-js-node), and frontend [here](https://github.com/rocketseat-education/nlw-pocket-js-react).
 
 ## Contact
 May you have questions or suggestions, feel free to open an issue or contact the project maintainers.

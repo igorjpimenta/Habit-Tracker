@@ -74,8 +74,23 @@ export const goalsCompletedByWeekDay = db
       .groupBy(goalsCompletedInWeek.completedOn)
   )
 
-export async function getGoalDetails(goalId: string) {
+export async function getGoal(goalId: string) {
   const [goal] = await db
+    .select({
+      id: goals.id,
+      title: goals.title,
+      desiredWeeklyFrequency: goals.desiredWeeklyFrequency,
+      createdAt: goals.createdAt,
+    })
+    .from(goals)
+    .where(eq(goals.id, goalId))
+    .limit(1)
+
+  return goal
+}
+
+export async function getGoalDetails(goalId: string) {
+  const [goalDetails] = await db
     .with(goalCompletionsCount)
     .select({
       desiredWeeklyFrequency: goals.desiredWeeklyFrequency,
@@ -90,5 +105,5 @@ export async function getGoalDetails(goalId: string) {
     .where(eq(goals.id, goalId))
     .limit(1)
 
-  return goal
+  return goalDetails
 }

@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "dotenv --file ../.env tsx watch src/http/server.ts",
+    "migrate": "npx drizzle-kit migrate",
     "seed": "dotenv --file ../.env tsx src/db/seed.ts"
   },
   "keywords": [],

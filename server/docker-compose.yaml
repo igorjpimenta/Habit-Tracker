@@ -1,4 +1,4 @@
-name: habbit-tracker-server
+name: habit-tracker-server
 
 services:
   pg:

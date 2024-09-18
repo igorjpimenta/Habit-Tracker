@@ -3,15 +3,15 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from '../../../components/dialog'
-import { Label } from '../../../components/label'
-import { Input } from '../../../components/input'
+} from '../../../../components/dialog'
+import { Label } from '../../../../components/label'
+import { Input } from '../../../../components/input'
 import {
   RadioGroup,
   RadioGroupIndicator,
   RadioGroupItem,
-} from '../../../components/radio-group'
-import { Button } from '../../../components/button'
+} from '../../../../components/radio-group'
+import { Button } from '../../../../components/button'
 
 import { X } from 'lucide-react'
 

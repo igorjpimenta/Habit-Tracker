@@ -1,7 +1,7 @@
 import { Dialog } from '../../components/dialog'
-import { CreateGoalDialog } from './components/create-goal-dialog'
-import { EmptyGoals } from './components/empty-goals'
-import { Summary } from './components/summary'
+import { CreateGoalDialog } from './summary/components/create-goal-dialog'
+import { EmptyGoals } from './empty-goals'
+import { Summary } from './summary'
 import { getWeekSummary } from '../../http/get-week-summary'
 
 import { useQuery } from '@tanstack/react-query'

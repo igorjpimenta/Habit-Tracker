@@ -4,7 +4,7 @@ import { Icon } from '../../../components/icon'
 import { Progress, ProgressIndicator } from '../../../components/progress-bar'
 import { Separator } from '../../../components/separator'
 import { getWeekSummary } from '../../../http/get-week-summary'
-import { PendingGoals } from './pending-goals'
+import { PendingGoals } from './components/pending-goals'
 
 import { CheckCircle2, Plus } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
@@ -52,7 +52,7 @@ export function Summary() {
 
   const sortedSummaryByDate = Object.entries(
     summary.goalsCompletionsPerDay
-  ).sort(([dateA], [dateB]) => dayjs(dateA).valueOf() - dayjs(dateB).valueOf())
+  ).sort(([dateA], [dateB]) => dayjs(dateB).valueOf() - dayjs(dateA).valueOf())
 
   return (
     <div className="max-w-[480px] py-10 px-5 mx-auto flex flex-col gap-6">
@@ -101,12 +101,10 @@ export function Summary() {
           const weekDay = dayjs(date).format('dddd')
           const formattedDate = dayjs(date).format('MMMM D')
 
-          const sortedGoalsByCompletedAt = goals.sort((a, b) =>
-            dayjs(a.completedAt, 'HH:mm:ss').isBefore(
-              dayjs(b.completedAt, 'HH:mm:ss')
-            )
-              ? -1
-              : 1
+          const sortedGoalsByCompletedAt = goals.sort(
+            (a, b) =>
+              dayjs(a.completedAt, 'HH:mm:ss').valueOf() -
+              dayjs(b.completedAt, 'HH:mm:ss').valueOf()
           )
 
           return (

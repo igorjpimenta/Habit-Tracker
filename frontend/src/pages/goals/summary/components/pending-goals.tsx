@@ -1,5 +1,5 @@
-import { OutlineButton } from '../../../components/outline-button'
-import { getWeekPendingGoals } from '../../../http/get-week-pending-goals'
+import { OutlineButton } from '../../../../components/outline-button'
+import { getWeekPendingGoals } from '../../../../http/get-week-pending-goals'
 
 import { Plus } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'

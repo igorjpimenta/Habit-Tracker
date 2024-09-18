@@ -1,10 +1,13 @@
 import { OutlineButton } from '../../../../components/outline-button'
 import { getWeekPendingGoals } from '../../../../http/get-week-pending-goals'
+import { createGoalCompletion } from '../../../../http/create-goal-completion'
 
 import { Plus } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 export function PendingGoals() {
+  const queryClient = useQueryClient()
+
   const { data: pendingGoals } = useQuery({
     queryKey: ['pending-goals'],
     queryFn: getWeekPendingGoals,
@@ -13,6 +16,13 @@ export function PendingGoals() {
 
   if (!pendingGoals) {
     return null
+  }
+
+  async function handleCompleteGoal(goalId: string) {
+    await createGoalCompletion({ goalId })
+
+    queryClient.invalidateQueries({ queryKey: ['summary'] })
+    queryClient.invalidateQueries({ queryKey: ['pending-goals'] })
   }
 
   const sortedPendingGoals = pendingGoals.sort((a, b) => {
@@ -32,7 +42,11 @@ export function PendingGoals() {
         const completed = goal.completionCount >= goal.desiredWeeklyFrequency
 
         return (
-          <OutlineButton key={goal.id} disabled={completed}>
+          <OutlineButton
+            key={goal.id}
+            disabled={completed}
+            onClick={() => handleCompleteGoal(goal.id)}
+          >
             <Plus className="size-4 text-zinc-400" />
             {goal.title}
           </OutlineButton>

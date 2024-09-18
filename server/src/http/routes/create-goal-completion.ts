@@ -5,16 +5,16 @@ import z from 'zod'
 
 export const createGoalCompletionRoute: FastifyPluginAsyncZod = async app => {
   app.patch(
-    '/completions',
+    '/goals/:goalId/completion',
     {
       schema: {
-        body: z.object({
+        params: z.object({
           goalId: z.string(),
         }),
       },
     },
     async request => {
-      const { goalId } = request.body
+      const { goalId } = request.params
 
       await createGoalCompletion({
         goalId,

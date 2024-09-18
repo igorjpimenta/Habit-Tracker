@@ -4,17 +4,61 @@ import { Icon } from '../../../components/icon'
 import { Progress, ProgressIndicator } from '../../../components/progress-bar'
 import { Separator } from '../../../components/separator'
 import { OutlineButton } from '../../../components/outline-button'
+import { getWeekSummary } from '../../../http/get-week-summary'
 
 import { CheckCircle2, Plus } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+
+dayjs.extend(customParseFormat)
 
 export function Summary() {
+  const { data: summary } = useQuery({
+    queryKey: ['summary'],
+    queryFn: getWeekSummary,
+    staleTime: 1000 * 60,
+  })
+
+  if (!summary) {
+    return null
+  }
+
+  function formatDateRange(startDate: Date, endDate: Date): string {
+    const startMonth = startDate.toLocaleString('default', { month: 'long' })
+    const endMonth = endDate.toLocaleString('default', { month: 'long' })
+
+    const startDay = startDate.getDate()
+    const endDay = endDate.getDate()
+
+    if (startDate === endDate) {
+      return `${startMonth} ${startDay}`
+    }
+
+    if (startMonth === endMonth) {
+      return `${startMonth} ${startDay} to ${endDay}`
+    }
+
+    return `${startMonth} ${startDay} to ${endMonth} ${endDay}`
+  }
+
+  const firstDayOfWeek = dayjs().startOf('week').toDate()
+  const lastDayOfWeek = dayjs().endOf('week').toDate()
+
+  const completedPercentage = (
+    (summary.completed / summary.total) *
+    100
+  ).toFixed()
+
   return (
     <div className="max-w-[480px] py-10 px-5 mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Icon />
 
-          <span className="text-lg font-semibold">August 5 to 10</span>
+          <span className="text-lg font-semibold">
+            {formatDateRange(firstDayOfWeek, lastDayOfWeek)}
+          </span>
         </div>
 
         <DialogTrigger asChild>
@@ -26,17 +70,19 @@ export function Summary() {
       </div>
 
       <div className="flex flex-col gap-3">
-        <Progress value={8} max={15}>
-          <ProgressIndicator style={{ width: '50%' }} />
+        <Progress value={summary.completed} max={summary.total}>
+          <ProgressIndicator style={{ width: `${completedPercentage}%` }} />
         </Progress>
 
         <div className="flex items-center justify-between text-xs text-zinc-400">
           <span>
-            You have done <span className="text-zinc-100">8</span> of{' '}
-            <span className="text-zinc-100">15</span> goals this week.
+            You have done{' '}
+            <span className="text-zinc-100">{summary.completed}</span> of{' '}
+            <span className="text-zinc-100">{summary.total}</span> goals this
+            week.
           </span>
 
-          <span>58%</span>
+          <span>{completedPercentage}%</span>
         </div>
       </div>
 
@@ -67,113 +113,47 @@ export function Summary() {
       <div className="flex flex-col gap-6">
         <h2 className="text-xl font-medium">Your week</h2>
 
-        <div className="flex flex-col gap-4">
-          <h3 className="font-medium">
-            Sunday <span className="text-zinc-400 text-xs">(August 10)</span>
-          </h3>
+        {Object.entries(summary.goalsCompletionsPerDay).map(([date, goals]) => {
+          const weekDay = dayjs(date).format('dddd')
+          const formattedDate = dayjs(date).format('MMMM D')
 
-          <ul className="flex flex-col gap-3">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="size-4 text-pink-500" />
+          return (
+            <div key={date} className="flex flex-col gap-4">
+              <h3 className="font-medium">
+                {weekDay}{' '}
+                <span className="text-zinc-400 text-xs">({formattedDate})</span>
+              </h3>
 
-              <span className="text-sm text-zinc-400">
-                You have done "
-                <span className="text-zinc-100">Wake up earlier</span>" at{' '}
-                <span className="text-zinc-100">08:13a.m.</span>
-              </span>
+              <ul className="flex flex-col gap-3">
+                {goals.map(goal => {
+                  const formattedTime = dayjs(
+                    goal.completedAt,
+                    'HH:mm:ss'
+                  ).format('h:mma')
 
-              <button type="button" className="text-xs text-zinc-500 underline">
-                Undo
-              </button>
-            </li>
+                  return (
+                    <li key={goal.id} className="flex items-center gap-2">
+                      <CheckCircle2 className="size-4 text-pink-500" />
 
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="size-4 text-pink-500" />
+                      <span className="text-sm text-zinc-400">
+                        You have done "
+                        <span className="text-zinc-100">{goal.title}</span>" at{' '}
+                        <span className="text-zinc-100">{formattedTime}</span>
+                      </span>
 
-              <span className="text-sm text-zinc-400">
-                You have done "
-                <span className="text-zinc-100">Wake up earlier</span>" at{' '}
-                <span className="text-zinc-100">08:13a.m.</span>
-              </span>
-
-              <button type="button" className="text-xs text-zinc-500 underline">
-                Undo
-              </button>
-            </li>
-
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="size-4 text-pink-500" />
-
-              <span className="text-sm text-zinc-400">
-                You have done "
-                <span className="text-zinc-100">Wake up earlier</span>" at{' '}
-                <span className="text-zinc-100">08:13a.m.</span>
-              </span>
-
-              <button type="button" className="text-xs text-zinc-500 underline">
-                Undo
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <h3 className="font-medium">
-            Monday <span className="text-zinc-400 text-xs">(August 11)</span>
-          </h3>
-
-          <ul className="flex flex-col gap-3">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="size-4 text-pink-500" />
-
-              <span className="text-sm text-zinc-400">
-                You have done "
-                <span className="text-zinc-100">Wake up earlier</span>" at{' '}
-                <span className="text-zinc-100">08:13a.m.</span>
-              </span>
-
-              <button type="button" className="text-xs text-zinc-500 underline">
-                Undo
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <h3 className="font-medium">
-            Tuesday <span className="text-zinc-400 text-xs">(August 12)</span>
-          </h3>
-
-          <ul className="flex flex-col gap-3">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="size-4 text-pink-500" />
-
-              <span className="text-sm text-zinc-400">
-                You have done "
-                <span className="text-zinc-100">Wake up earlier</span>" at{' '}
-                <span className="text-zinc-100">08:13a.m.</span>
-              </span>
-
-              <button type="button" className="text-xs text-zinc-500 underline">
-                Undo
-              </button>
-            </li>
-
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="size-4 text-pink-500" />
-
-              <span className="text-sm text-zinc-400">
-                You have done "
-                <span className="text-zinc-100">Wake up earlier</span>" at{' '}
-                <span className="text-zinc-100">08:13a.m.</span>
-              </span>
-
-              <button type="button" className="text-xs text-zinc-500 underline">
-                Undo
-              </button>
-            </li>
-          </ul>
-        </div>
+                      <button
+                        type="button"
+                        className="text-xs text-zinc-500 underline"
+                      >
+                        Undo
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

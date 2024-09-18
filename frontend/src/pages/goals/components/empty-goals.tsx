@@ -1,5 +1,5 @@
-import logo from '../assets/logo.svg'
-import letsStart from '../assets/lets-start-illustration.svg'
+import logo from '../../../assets/logo.svg'
+import letsStart from '../../../assets/lets-start-illustration.svg'
 import { Button } from '../../../components/button'
 import { DialogTrigger } from '../../../components/dialog'
 

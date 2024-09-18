@@ -3,8 +3,8 @@ import { DialogTrigger } from '../../../components/dialog'
 import { Icon } from '../../../components/icon'
 import { Progress, ProgressIndicator } from '../../../components/progress-bar'
 import { Separator } from '../../../components/separator'
-import { OutlineButton } from '../../../components/outline-button'
 import { getWeekSummary } from '../../../http/get-week-summary'
+import { PendingGoals } from './pending-goals'
 
 import { CheckCircle2, Plus } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
@@ -50,6 +50,10 @@ export function Summary() {
     100
   ).toFixed()
 
+  const sortedSummaryByDate = Object.entries(
+    summary.goalsCompletionsPerDay
+  ).sort(([dateA], [dateB]) => dayjs(dateA).valueOf() - dayjs(dateB).valueOf())
+
   return (
     <div className="max-w-[480px] py-10 px-5 mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -88,34 +92,22 @@ export function Summary() {
 
       <Separator />
 
-      <div className="flex flex-wrap gap-3">
-        <OutlineButton>
-          <Plus className="size-4 text-zinc-400" />
-          Pratice yoga
-        </OutlineButton>
-
-        <OutlineButton>
-          <Plus className="size-4 text-zinc-400" />
-          Workout
-        </OutlineButton>
-
-        <OutlineButton>
-          <Plus className="size-4 text-zinc-400" />
-          Make the bed
-        </OutlineButton>
-
-        <OutlineButton disabled>
-          <Plus className="size-4 text-zinc-400" />
-          Read books
-        </OutlineButton>
-      </div>
+      <PendingGoals />
 
       <div className="flex flex-col gap-6">
         <h2 className="text-xl font-medium">Your week</h2>
 
-        {Object.entries(summary.goalsCompletionsPerDay).map(([date, goals]) => {
+        {sortedSummaryByDate.map(([date, goals]) => {
           const weekDay = dayjs(date).format('dddd')
           const formattedDate = dayjs(date).format('MMMM D')
+
+          const sortedGoalsByCompletedAt = goals.sort((a, b) =>
+            dayjs(a.completedAt, 'HH:mm:ss').isBefore(
+              dayjs(b.completedAt, 'HH:mm:ss')
+            )
+              ? -1
+              : 1
+          )
 
           return (
             <div key={date} className="flex flex-col gap-4">
@@ -125,7 +117,7 @@ export function Summary() {
               </h3>
 
               <ul className="flex flex-col gap-3">
-                {goals.map(goal => {
+                {sortedGoalsByCompletedAt.map(goal => {
                   const formattedTime = dayjs(
                     goal.completedAt,
                     'HH:mm:ss'

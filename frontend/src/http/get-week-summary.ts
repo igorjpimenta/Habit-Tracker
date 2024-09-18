@@ -2,7 +2,7 @@ import { config } from '../../config'
 
 import axios from 'axios'
 
-export interface WeekSummaryResponse {
+interface WeekSummaryResponse {
   total: number
   completed: number
   goalsCompletionsPerDay: Record<

@@ -17,8 +17,11 @@ interface WeekSummaryResponse {
 }
 
 export async function getWeekSummary(): Promise<WeekSummaryResponse> {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
   const { data } = await axios.get<{ summary: WeekSummaryResponse }>(
-    `${config.API_URL}/summary`
+    `${config.API_URL}/summary`,
+    { params: { timezone } }
   )
 
   return data.summary

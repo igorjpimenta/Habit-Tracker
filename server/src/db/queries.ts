@@ -42,7 +42,7 @@ export const goalsCompletedInWeek = db.$with('goals_completed_in_week').as(
           date(${goalCompletions.createdAt})
         `.as('completed_on'),
       completedAt: sql /*sql*/`
-          ${goalCompletions.createdAt}::time
+          ${goalCompletions.createdAt}
         `.as('completed_at'),
     })
     .from(goalCompletions)
@@ -55,26 +55,33 @@ export const goalsCompletedInWeek = db.$with('goals_completed_in_week').as(
     )
 )
 
-export const goalsCompletedByWeekDay = db
-  .$with('goals_completed_by_week_day')
-  .as(
+export const goalsCompletedByWeekDay = (timezone: string) => {
+  const timezoneParam = sql`${sql.raw(`'${timezone}'`)}`
+
+  return db.$with('goals_completed_by_week_day').as(
     db
       .select({
-        completedOn: goalsCompletedInWeek.completedOn,
+        completedOn:
+          sql /*sql*/`date(${goalsCompletedInWeek.completedAt} AT TIME ZONE ${timezoneParam})`.as(
+            'completed_on'
+          ),
         completions: sql /*sql*/`
             json_agg(
               json_build_object(
                 'id', ${goalsCompletedInWeek.id},
                 'goalId', ${goalsCompletedInWeek.goalId},
                 'title', ${goalsCompletedInWeek.title},
-                'completedAt', ${goalsCompletedInWeek.completedAt}
+                'completedAt', (${goalsCompletedInWeek.completedAt} AT TIME ZONE ${timezoneParam})::time
               )
             )
           `.as('completions'),
       })
       .from(goalsCompletedInWeek)
-      .groupBy(goalsCompletedInWeek.completedOn)
+      .groupBy(
+        sql /*sql*/`date(${goalsCompletedInWeek.completedAt} AT TIME ZONE ${timezoneParam})`
+      )
   )
+}
 
 export async function getGoal(goalId: string) {
   const [goal] = await db

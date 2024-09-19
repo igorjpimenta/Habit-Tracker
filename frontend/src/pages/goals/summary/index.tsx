@@ -9,7 +9,7 @@ import { GoalCompletion } from './components/goal-completion'
 
 import { Plus } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
+import dayjs, { type Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 
 dayjs.extend(customParseFormat)
@@ -41,6 +41,21 @@ export function Summary() {
     }
 
     return `${startMonth} ${startDay} to ${endMonth} ${endDay}`
+  }
+
+  function formatWeekDay(date: Dayjs) {
+    const today = dayjs()
+    const yesterday = today.subtract(1, 'day')
+
+    if (date.isSame(today, 'date')) {
+      return 'Today'
+    }
+
+    if (date.isSame(yesterday, 'date')) {
+      return 'Yesterday'
+    }
+
+    return date.format('dddd')
   }
 
   const firstDayOfWeek = dayjs().startOf('week').toDate()
@@ -99,13 +114,13 @@ export function Summary() {
         <h2 className="text-xl font-medium">Your week</h2>
 
         {sortedSummaryByDate.map(([date, goalsCompletions]) => {
-          const weekDay = dayjs(date).format('dddd')
+          const weekDay = formatWeekDay(dayjs(date))
           const formattedDate = dayjs(date).format('MMMM D')
 
           const sortedGoalsCompletionsByCompletedAt = goalsCompletions.sort(
             (a, b) =>
-              dayjs(a.completedAt, 'HH:mm:ss').valueOf() -
-              dayjs(b.completedAt, 'HH:mm:ss').valueOf()
+              dayjs(b.completedAt, 'HH:mm:ss').valueOf() -
+              dayjs(a.completedAt, 'HH:mm:ss').valueOf()
           )
 
           return (

@@ -9,6 +9,7 @@ interface WeekSummaryResponse {
     string,
     {
       id: string
+      goalId: string
       title: string
       completedAt: string
     }[]

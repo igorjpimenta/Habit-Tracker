@@ -2,6 +2,7 @@ require('dotenv').config({ path: '../.env' })
 
 import { createGoalRoute } from './routes/create-goal'
 import { createGoalCompletionRoute } from './routes/create-goal-completion'
+import { deleteGoalCompletionRoute } from './routes/delete-goal-completion'
 import { getWeekPendingGoalsRoute } from './routes/get-week-pending-goals'
 import { getWeekSummaryRoute } from './routes/get-week-summary'
 import { errorHandler } from './middleware/error-handler'
@@ -21,7 +22,6 @@ app.register(fastifyCors, {
 })
 
 app.setErrorHandler(errorHandler)
-
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
@@ -29,6 +29,7 @@ app.register(getWeekPendingGoalsRoute)
 app.register(getWeekSummaryRoute)
 app.register(createGoalRoute)
 app.register(createGoalCompletionRoute)
+app.register(deleteGoalCompletionRoute)
 
 app
   .listen({

@@ -5,8 +5,9 @@ import { Progress, ProgressIndicator } from '../../../components/progress-bar'
 import { Separator } from '../../../components/separator'
 import { getWeekSummary } from '../../../http/get-week-summary'
 import { PendingGoals } from './components/pending-goals'
+import { GoalCompletion } from './components/goal-completion'
 
-import { CheckCircle2, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -97,11 +98,11 @@ export function Summary() {
       <div className="flex flex-col gap-6">
         <h2 className="text-xl font-medium">Your week</h2>
 
-        {sortedSummaryByDate.map(([date, goals]) => {
+        {sortedSummaryByDate.map(([date, goalsCompletions]) => {
           const weekDay = dayjs(date).format('dddd')
           const formattedDate = dayjs(date).format('MMMM D')
 
-          const sortedGoalsByCompletedAt = goals.sort(
+          const sortedGoalsCompletionsByCompletedAt = goalsCompletions.sort(
             (a, b) =>
               dayjs(a.completedAt, 'HH:mm:ss').valueOf() -
               dayjs(b.completedAt, 'HH:mm:ss').valueOf()
@@ -115,29 +116,20 @@ export function Summary() {
               </h3>
 
               <ul className="flex flex-col gap-3">
-                {sortedGoalsByCompletedAt.map(goal => {
+                {sortedGoalsCompletionsByCompletedAt.map(goalCompletion => {
                   const formattedTime = dayjs(
-                    goal.completedAt,
+                    goalCompletion.completedAt,
                     'HH:mm:ss'
                   ).format('h:mma')
 
                   return (
-                    <li key={goal.id} className="flex items-center gap-2">
-                      <CheckCircle2 className="size-4 text-pink-500" />
-
-                      <span className="text-sm text-zinc-400">
-                        You have done "
-                        <span className="text-zinc-100">{goal.title}</span>" at{' '}
-                        <span className="text-zinc-100">{formattedTime}</span>
-                      </span>
-
-                      <button
-                        type="button"
-                        className="text-xs text-zinc-500 underline"
-                      >
-                        Undo
-                      </button>
-                    </li>
+                    <GoalCompletion
+                      key={goalCompletion.id}
+                      completionId={goalCompletion.id}
+                      goalId={goalCompletion.goalId}
+                      title={goalCompletion.title}
+                      completedAt={formattedTime}
+                    />
                   )
                 })}
               </ul>

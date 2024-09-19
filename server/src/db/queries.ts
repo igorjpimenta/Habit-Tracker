@@ -36,6 +36,7 @@ export const goalsCompletedInWeek = db.$with('goals_completed_in_week').as(
   db
     .select({
       id: goalCompletions.id,
+      goalId: goalCompletions.goalId,
       title: goals.title,
       completedOn: sql /*sql*/`
           date(${goalCompletions.createdAt})
@@ -64,6 +65,7 @@ export const goalsCompletedByWeekDay = db
             json_agg(
               json_build_object(
                 'id', ${goalsCompletedInWeek.id},
+                'goalId', ${goalsCompletedInWeek.goalId},
                 'title', ${goalsCompletedInWeek.title},
                 'completedAt', ${goalsCompletedInWeek.completedAt}
               )
@@ -87,6 +89,25 @@ export async function getGoal(goalId: string) {
     .limit(1)
 
   return goal
+}
+
+export async function getGoalCompletion(goalId: string, completionId: string) {
+  const [goalCompletion] = await db
+    .select({
+      id: goalCompletions.id,
+      goalId: goalCompletions.goalId,
+      createdAt: goalCompletions.createdAt,
+    })
+    .from(goalCompletions)
+    .where(
+      and(
+        eq(goalCompletions.goalId, goalId),
+        eq(goalCompletions.id, completionId)
+      )
+    )
+    .limit(1)
+
+  return goalCompletion
 }
 
 export async function getGoalDetails(goalId: string) {

@@ -11,6 +11,7 @@ type GoalsCompletionsPerDayProps = Record<
   string,
   {
     id: string
+    goalId: string
     title: string
     completedAt: string
   }[]

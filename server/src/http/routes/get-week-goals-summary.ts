@@ -1,4 +1,4 @@
-import { getWeekSummary } from '../../functions/get-week-summary'
+import { getWeekGoalsSummary } from '../../functions/get-week-goals-summary'
 import { APIError } from '../../utils/error-handler'
 
 import z from 'zod'
@@ -11,9 +11,9 @@ import timezone from 'dayjs/plugin/timezone'
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
-export const getWeekSummaryRoute: FastifyPluginAsyncZod = async app => {
+export const getWeekGoalsSummaryRoute: FastifyPluginAsyncZod = async app => {
   app.get(
-    '/summary',
+    '/goals/summary',
     {
       schema: {
         querystring: z.object({
@@ -36,7 +36,7 @@ export const getWeekSummaryRoute: FastifyPluginAsyncZod = async app => {
     },
     async request => {
       const { timezone } = request.query
-      const { summary } = await getWeekSummary(timezone)
+      const { summary } = await getWeekGoalsSummary(timezone)
 
       return { summary }
     }

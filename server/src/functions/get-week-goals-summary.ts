@@ -17,7 +17,7 @@ type GoalsCompletionsPerDayProps = Record<
   }[]
 >
 
-export async function getWeekSummary(timezone = 'UTC') {
+export async function getWeekGoalsSummary(timezone = 'UTC') {
   const goalsCompletedByWeekDayQuery = goalsCompletedByWeekDay(timezone)
 
   const [summary] = await db

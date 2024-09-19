@@ -4,7 +4,7 @@ import { createGoalRoute } from './routes/create-goal'
 import { createGoalCompletionRoute } from './routes/create-goal-completion'
 import { deleteGoalCompletionRoute } from './routes/delete-goal-completion'
 import { getWeekPendingGoalsRoute } from './routes/get-week-pending-goals'
-import { getWeekSummaryRoute } from './routes/get-week-summary'
+import { getWeekGoalsSummaryRoute } from './routes/get-week-goals-summary'
 import { errorHandler } from './middleware/error-handler'
 
 import fastify from 'fastify'
@@ -25,11 +25,11 @@ app.setErrorHandler(errorHandler)
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
-app.register(getWeekPendingGoalsRoute)
-app.register(getWeekSummaryRoute)
 app.register(createGoalRoute)
 app.register(createGoalCompletionRoute)
 app.register(deleteGoalCompletionRoute)
+app.register(getWeekPendingGoalsRoute)
+app.register(getWeekGoalsSummaryRoute)
 
 app
   .listen({

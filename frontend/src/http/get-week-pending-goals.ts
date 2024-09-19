@@ -2,7 +2,7 @@ import { config } from '../../config'
 
 import axios from 'axios'
 
-interface WeekPendingGoalsResponse {
+interface GetWeekPendingGoalsResponse {
   id: string
   title: string
   desiredWeeklyFrequency: number
@@ -10,11 +10,11 @@ interface WeekPendingGoalsResponse {
 }
 
 export async function getWeekPendingGoals(): Promise<
-  WeekPendingGoalsResponse[]
+  GetWeekPendingGoalsResponse[]
 > {
   const { data } = await axios.get<{
-    pendingGoals: WeekPendingGoalsResponse[]
-  }>(`${config.API_URL}/pending-goals`)
+    pendingGoals: GetWeekPendingGoalsResponse[]
+  }>(`${config.API_URL}/goals/pending`)
 
   return data.pendingGoals
 }

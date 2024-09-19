@@ -3,7 +3,7 @@ import { DialogTrigger } from '../../../components/dialog'
 import { Icon } from '../../../components/icon'
 import { Progress, ProgressIndicator } from '../../../components/progress-bar'
 import { Separator } from '../../../components/separator'
-import { getWeekSummary } from '../../../http/get-week-summary'
+import { getWeekGoalsSummary } from '../../../http/get-week-goals-summary'
 import { PendingGoals } from './components/pending-goals'
 import { GoalCompletion } from './components/goal-completion'
 
@@ -14,10 +14,10 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 
 dayjs.extend(customParseFormat)
 
-export function Summary() {
+export function GoalsSummary() {
   const { data: summary } = useQuery({
     queryKey: ['summary'],
-    queryFn: getWeekSummary,
+    queryFn: getWeekGoalsSummary,
     staleTime: 1000 * 60,
   })
 

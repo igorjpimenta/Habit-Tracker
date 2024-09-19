@@ -36,9 +36,11 @@ export async function getWeekGoalsSummary(timezone = 'UTC') {
           from ${goalsCompletedInWeek}
         )`.mapWith(Number),
       goalsCompletionsPerDay: sql /*sql*/<GoalsCompletionsPerDayProps>`(
-          select json_object_agg(
-            ${goalsCompletedByWeekDayQuery.completedOn},
-            ${goalsCompletedByWeekDayQuery.completions}
+          select coalesce(
+            json_object_agg(
+              ${goalsCompletedByWeekDayQuery.completedOn},
+              ${goalsCompletedByWeekDayQuery.completions}
+            ), '{}'::json
           )
           from ${goalsCompletedByWeekDayQuery}
         )`,

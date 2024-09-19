@@ -113,44 +113,52 @@ export function GoalsSummary() {
       <div className="flex flex-col gap-6">
         <h2 className="text-xl font-medium">Your week</h2>
 
-        {sortedSummaryByDate.map(([date, goalsCompletions]) => {
-          const weekDay = formatWeekDay(dayjs(date))
-          const formattedDate = dayjs(date).format('MMMM D')
+        {sortedSummaryByDate.length === 0 ? (
+          <div className="text-sm text-gray-400">
+            <p>You haven't completed any goals this week.</p>
+          </div>
+        ) : (
+          sortedSummaryByDate.map(([date, goalsCompletions]) => {
+            const weekDay = formatWeekDay(dayjs(date))
+            const formattedDate = dayjs(date).format('MMMM D')
 
-          const sortedGoalsCompletionsByCompletedAt = goalsCompletions.sort(
-            (a, b) =>
-              dayjs(b.completedAt, 'HH:mm:ss').valueOf() -
-              dayjs(a.completedAt, 'HH:mm:ss').valueOf()
-          )
+            const sortedGoalsCompletionsByCompletedAt = goalsCompletions.sort(
+              (a, b) =>
+                dayjs(b.completedAt, 'HH:mm:ss').valueOf() -
+                dayjs(a.completedAt, 'HH:mm:ss').valueOf()
+            )
 
-          return (
-            <div key={date} className="flex flex-col gap-4">
-              <h3 className="font-medium">
-                {weekDay}{' '}
-                <span className="text-zinc-400 text-xs">({formattedDate})</span>
-              </h3>
+            return (
+              <div key={date} className="flex flex-col gap-4">
+                <h3 className="font-medium">
+                  {weekDay}{' '}
+                  <span className="text-zinc-400 text-xs">
+                    ({formattedDate})
+                  </span>
+                </h3>
 
-              <ul className="flex flex-col gap-3">
-                {sortedGoalsCompletionsByCompletedAt.map(goalCompletion => {
-                  const formattedTime = dayjs(
-                    goalCompletion.completedAt,
-                    'HH:mm:ss'
-                  ).format('h:mma')
+                <ul className="flex flex-col gap-3">
+                  {sortedGoalsCompletionsByCompletedAt.map(goalCompletion => {
+                    const formattedTime = dayjs(
+                      goalCompletion.completedAt,
+                      'HH:mm:ss'
+                    ).format('h:mma')
 
-                  return (
-                    <GoalCompletion
-                      key={goalCompletion.id}
-                      completionId={goalCompletion.id}
-                      goalId={goalCompletion.goalId}
-                      title={goalCompletion.title}
-                      completedAt={formattedTime}
-                    />
-                  )
-                })}
-              </ul>
-            </div>
-          )
-        })}
+                    return (
+                      <GoalCompletion
+                        key={goalCompletion.id}
+                        completionId={goalCompletion.id}
+                        goalId={goalCompletion.goalId}
+                        title={goalCompletion.title}
+                        completedAt={formattedTime}
+                      />
+                    )
+                  })}
+                </ul>
+              </div>
+            )
+          })
+        )}
       </div>
     </div>
   )

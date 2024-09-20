@@ -7,9 +7,11 @@ import { StatusCodes } from 'http-status-codes'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
+dayjs.extend(weekOfYear)
 
 export const getWeekGoalsSummaryRoute: FastifyPluginAsyncZod = async app => {
   app.get(
@@ -31,12 +33,18 @@ export const getWeekGoalsSummaryRoute: FastifyPluginAsyncZod = async app => {
                 )
               }
             }),
+          year: z.coerce.number().optional().default(dayjs().year()),
+          weekOfYear: z.coerce.number().optional().default(dayjs().week()),
         }),
       },
     },
     async request => {
-      const { timezone } = request.query
-      const { summary } = await getWeekGoalsSummary(timezone)
+      const { timezone, year, weekOfYear } = request.query
+      const { summary } = await getWeekGoalsSummary({
+        timezone,
+        year,
+        weekOfYear,
+      })
 
       return { summary }
     }

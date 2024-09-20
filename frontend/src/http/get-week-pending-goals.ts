@@ -12,9 +12,11 @@ interface GetWeekPendingGoalsResponse {
 export async function getWeekPendingGoals(): Promise<
   GetWeekPendingGoalsResponse[]
 > {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
   const { data } = await axios.get<{
     pendingGoals: GetWeekPendingGoalsResponse[]
-  }>(`${config.API_URL}/goals/pending`)
+  }>(`${config.API_URL}/goals/pending`, { params: { timezone } })
 
   return data.pendingGoals
 }

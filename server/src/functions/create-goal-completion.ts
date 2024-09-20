@@ -21,8 +21,9 @@ export async function createGoalCompletion({
     )
   }
 
-  const { completionsCount, desiredWeeklyFrequency } =
-    await getGoalDetails(goalId)
+  const { completionsCount, desiredWeeklyFrequency } = await getGoalDetails({
+    goalId,
+  })
 
   if (completionsCount >= desiredWeeklyFrequency) {
     throw new APIError(

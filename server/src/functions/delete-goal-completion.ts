@@ -1,6 +1,6 @@
 import { db } from '../db'
 import { goalCompletions } from '../db/schema'
-import { getGoalCompletion, getGoalDetails } from '../db/queries'
+import { getGoalCompletion } from '../db/queries'
 import { APIError } from '../utils/error-handler'
 
 import { StatusCodes } from 'http-status-codes'

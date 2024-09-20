@@ -2,7 +2,13 @@ import { config } from '../../config'
 
 import axios from 'axios'
 
+interface GetWeekGoalsSummaryRequest {
+  year: number
+  weekOfYear: number
+}
+
 interface GetWeekGoalsSummaryResponse {
+  allTimeTotal: number
   total: number
   completed: number
   goalsCompletionsPerDay: Record<
@@ -16,12 +22,15 @@ interface GetWeekGoalsSummaryResponse {
   >
 }
 
-export async function getWeekGoalsSummary(): Promise<GetWeekGoalsSummaryResponse> {
+export async function getWeekGoalsSummary({
+  year,
+  weekOfYear,
+}: GetWeekGoalsSummaryRequest): Promise<GetWeekGoalsSummaryResponse> {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   const { data } = await axios.get<{ summary: GetWeekGoalsSummaryResponse }>(
     `${config.API_URL}/goals/summary`,
-    { params: { timezone } }
+    { params: { timezone, year, weekOfYear } }
   )
 
   return data.summary

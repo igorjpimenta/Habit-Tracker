@@ -7,17 +7,26 @@ import { getWeekGoalsSummary } from '../../../http/get-week-goals-summary'
 import { PendingGoals } from './components/pending-goals'
 import { GoalCompletion } from './components/goal-completion'
 
-import { Plus } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import dayjs, { type Dayjs } from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
 
-dayjs.extend(customParseFormat)
+interface GoalsSummaryProps {
+  year: number
+  weekOfYear: number
+  onWeekDecreasing: () => void
+  onWeekIncreasing: () => void
+}
 
-export function GoalsSummary() {
+export function GoalsSummary({
+  year,
+  weekOfYear,
+  onWeekDecreasing,
+  onWeekIncreasing,
+}: GoalsSummaryProps) {
   const { data: summary } = useQuery({
-    queryKey: ['summary'],
-    queryFn: getWeekGoalsSummary,
+    queryKey: ['summary', year, weekOfYear],
+    queryFn: () => getWeekGoalsSummary({ year, weekOfYear }),
     staleTime: 1000 * 60,
   })
 
@@ -58,8 +67,9 @@ export function GoalsSummary() {
     return date.format('dddd')
   }
 
-  const firstDayOfWeek = dayjs().startOf('week').toDate()
-  const lastDayOfWeek = dayjs().endOf('week').toDate()
+  const firstDayOfWeek = dayjs().week(weekOfYear).startOf('week').toDate()
+  const lastDayOfWeek = dayjs().week(weekOfYear).endOf('week').toDate()
+  const isCurrentWeek = weekOfYear === dayjs().week()
 
   const completedPercentage = (
     (summary.completed / summary.total) *
@@ -72,50 +82,79 @@ export function GoalsSummary() {
 
   return (
     <div className="max-w-[480px] py-10 px-5 mx-auto flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Icon />
+      <div className="relative flex justify-between items-center">
+        <button
+          type="button"
+          className="absolute left-0 p-1.5 -ml-8 text-zinc-500 enabled:hover:text-zinc-400 disabled:opacity-40"
+          onClick={onWeekDecreasing}
+        >
+          <ChevronLeft className="size-4" />
+        </button>
 
-          <span className="text-lg font-semibold">
-            {formatDateRange(firstDayOfWeek, lastDayOfWeek)}
-          </span>
+        <div className="flex flex-1 items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Icon />
+
+            <span className="text-lg font-semibold">
+              {formatDateRange(firstDayOfWeek, lastDayOfWeek)}
+            </span>
+          </div>
+
+          <DialogTrigger asChild>
+            <Button
+              size="sm"
+              disabled={!isCurrentWeek}
+              className="disabled:opacity-0"
+            >
+              <Plus className="size-4" />
+              Create goal
+            </Button>
+          </DialogTrigger>
         </div>
 
-        <DialogTrigger asChild>
-          <Button size="sm">
-            <Plus className="size-4" />
-            Create goal
-          </Button>
-        </DialogTrigger>
+        <button
+          type="button"
+          className="absolute right-0 p-1.5 -mr-8 text-zinc-500 enabled:hover:text-zinc-400 disabled:opacity-40"
+          onClick={onWeekIncreasing}
+          disabled={isCurrentWeek}
+        >
+          <ChevronRight className="size-4" />
+        </button>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <Progress value={summary.completed} max={summary.total}>
-          <ProgressIndicator style={{ width: `${completedPercentage}%` }} />
-        </Progress>
+      {summary.total > 0 && (
+        <div className="flex flex-col gap-3">
+          <Progress value={summary.completed} max={summary.total}>
+            <ProgressIndicator style={{ width: `${completedPercentage}%` }} />
+          </Progress>
 
-        <div className="flex items-center justify-between text-xs text-zinc-400">
-          <span>
-            You have done{' '}
-            <span className="text-zinc-100">{summary.completed}</span> of{' '}
-            <span className="text-zinc-100">{summary.total}</span> goals this
-            week.
-          </span>
+          <div className="flex items-center justify-between text-xs text-zinc-400">
+            <span>
+              You have done{' '}
+              <span className="text-zinc-100">{summary.completed}</span> of{' '}
+              <span className="text-zinc-100">{summary.total}</span> goals this
+              week.
+            </span>
 
-          <span>{completedPercentage}%</span>
+            <span>{completedPercentage}%</span>
+          </div>
         </div>
-      </div>
+      )}
 
       <Separator />
 
-      <PendingGoals />
+      {isCurrentWeek && <PendingGoals weekOfYear={weekOfYear} year={year} />}
 
       <div className="flex flex-col gap-6">
         <h2 className="text-xl font-medium">Your week</h2>
 
         {sortedSummaryByDate.length === 0 ? (
           <div className="text-sm text-gray-400">
-            <p>You haven't completed any goals this week.</p>
+            {summary.total > 0 ? (
+              <p>You haven't completed any goals this week.</p>
+            ) : (
+              <p>You didn't have any goals to complete this week.</p>
+            )}
           </div>
         ) : (
           sortedSummaryByDate.map(([date, goalsCompletions]) => {
@@ -151,6 +190,8 @@ export function GoalsSummary() {
                         goalId={goalCompletion.goalId}
                         title={goalCompletion.title}
                         completedAt={formattedTime}
+                        year={year}
+                        weekOfYear={weekOfYear}
                       />
                     )
                   })}

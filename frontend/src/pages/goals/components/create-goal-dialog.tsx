@@ -29,9 +29,15 @@ type CreateGoalForm = z.infer<typeof createGoalForm>
 
 interface CreateGoalDialogProps {
   onCreateGoal: () => void
+  year: number
+  weekOfYear: number
 }
 
-export function CreateGoalDialog({ onCreateGoal }: CreateGoalDialogProps) {
+export function CreateGoalDialog({
+  onCreateGoal,
+  year,
+  weekOfYear,
+}: CreateGoalDialogProps) {
   const queryClient = useQueryClient()
 
   const { register, control, handleSubmit, formState, reset } =
@@ -45,7 +51,7 @@ export function CreateGoalDialog({ onCreateGoal }: CreateGoalDialogProps) {
   }: CreateGoalForm) {
     await createGoal({ title, desiredWeeklyFrequency })
 
-    queryClient.invalidateQueries({ queryKey: ['summary'] })
+    queryClient.invalidateQueries({ queryKey: ['summary', year, weekOfYear] })
     queryClient.invalidateQueries({ queryKey: ['pending-goals'] })
 
     reset()

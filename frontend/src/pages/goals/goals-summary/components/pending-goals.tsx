@@ -5,7 +5,12 @@ import { createGoalCompletion } from '../../../../http/create-goal-completion'
 import { Plus } from 'lucide-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-export function PendingGoals() {
+interface PendingGoalsProps {
+  year: number
+  weekOfYear: number
+}
+
+export function PendingGoals({ year, weekOfYear }: PendingGoalsProps) {
   const queryClient = useQueryClient()
 
   const { data: pendingGoals } = useQuery({
@@ -21,7 +26,7 @@ export function PendingGoals() {
   async function handleCompleteGoal(goalId: string) {
     await createGoalCompletion({ goalId })
 
-    queryClient.invalidateQueries({ queryKey: ['summary'] })
+    queryClient.invalidateQueries({ queryKey: ['summary', year, weekOfYear] })
     queryClient.invalidateQueries({ queryKey: ['pending-goals'] })
   }
 

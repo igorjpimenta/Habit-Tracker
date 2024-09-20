@@ -8,6 +8,8 @@ interface GoalCompletionProps {
   goalId: string
   title: string
   completedAt: string
+  year: number
+  weekOfYear: number
 }
 
 export function GoalCompletion({
@@ -15,6 +17,8 @@ export function GoalCompletion({
   completionId,
   title,
   completedAt,
+  year,
+  weekOfYear,
 }: GoalCompletionProps) {
   const queryClient = useQueryClient()
 
@@ -24,7 +28,7 @@ export function GoalCompletion({
   ) {
     await deleteGoalCompletion({ goalId, completionId })
 
-    queryClient.invalidateQueries({ queryKey: ['summary'] })
+    queryClient.invalidateQueries({ queryKey: ['summary', year, weekOfYear] })
     queryClient.invalidateQueries({ queryKey: ['pending-goals'] })
   }
 

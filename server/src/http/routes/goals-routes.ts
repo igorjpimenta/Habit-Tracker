@@ -1,4 +1,6 @@
 import { handleCreateGoal } from '../handlers/create-goal'
+import { handleUpdateGoal } from '../handlers/update-goal'
+import { handleDeleteGoal } from '../handlers/delete-goal'
 import { handleCreateGoalCompletion } from '../handlers/create-goal-completion'
 import { handleDeleteGoalCompletion } from '../handlers/delete-goal-completion'
 import { handleGetWeekGoalsSummary } from '../handlers/get-week-goals-summary'
@@ -15,10 +17,19 @@ export const goalsRoutes: FastifyPluginAsyncZod = async app => {
 
   app.register(
     async app => {
-      app.patch('/', handleCreateGoalCompletion)
+      app.put('/', handleUpdateGoal)
 
-      app.delete('/:completionId', handleDeleteGoalCompletion)
+      app.delete('/', handleDeleteGoal)
+
+      app.register(
+        async app => {
+          app.patch('/', handleCreateGoalCompletion)
+
+          app.delete('/:completionId', handleDeleteGoalCompletion)
+        },
+        { prefix: '/completion' }
+      )
     },
-    { prefix: '/:goalId/completion' }
+    { prefix: '/:goalId' }
   )
 }

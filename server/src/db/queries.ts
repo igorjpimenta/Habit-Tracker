@@ -15,8 +15,8 @@ export const goalsCreated = db.$with('goals_created').as(
     .from(goals)
 )
 
-export const goalsCreatedInWeek = (firstDayOfWeek: Date, lastDayOfWeek: Date) =>
-  db.$with('goals_created_in_week').as(
+export const goalsCreatedUpToWeek = (lastDayOfWeek: Date) =>
+  db.$with('goals_created_up_to_week').as(
     db
       .with(goalsCreated)
       .select({
@@ -26,12 +26,7 @@ export const goalsCreatedInWeek = (firstDayOfWeek: Date, lastDayOfWeek: Date) =>
         createdAt: goalsCreated.createdAt,
       })
       .from(goalsCreated)
-      .where(
-        and(
-          gte(goalsCreated.createdAt, firstDayOfWeek),
-          lte(goalsCreated.createdAt, lastDayOfWeek)
-        )
-      )
+      .where(lte(goalsCreated.createdAt, lastDayOfWeek))
   )
 
 export const goalCompletionsCount = (

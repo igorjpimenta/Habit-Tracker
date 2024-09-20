@@ -1,10 +1,6 @@
 require('dotenv').config({ path: '../.env' })
 
-import { createGoalRoute } from './routes/create-goal'
-import { createGoalCompletionRoute } from './routes/create-goal-completion'
-import { deleteGoalCompletionRoute } from './routes/delete-goal-completion'
-import { getWeekPendingGoalsRoute } from './routes/get-week-pending-goals'
-import { getWeekGoalsSummaryRoute } from './routes/get-week-goals-summary'
+import { goalsRoutes } from './routes/goals-routes'
 import { errorHandler } from './middleware/error-handler'
 
 import fastify from 'fastify'
@@ -25,11 +21,7 @@ app.setErrorHandler(errorHandler)
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
 
-app.register(createGoalRoute)
-app.register(createGoalCompletionRoute)
-app.register(deleteGoalCompletionRoute)
-app.register(getWeekPendingGoalsRoute)
-app.register(getWeekGoalsSummaryRoute)
+app.register(goalsRoutes, { prefix: '/goals' })
 
 app
   .listen({

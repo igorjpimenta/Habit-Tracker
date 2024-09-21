@@ -7,10 +7,12 @@ import { StatusCodes } from 'http-status-codes'
 
 interface CreateGoalCompletionRequest {
   goalId: string
+  timezone?: string
 }
 
 export async function createGoalCompletion({
   goalId,
+  timezone = 'UTC',
 }: CreateGoalCompletionRequest) {
   const goal = await getGoal(goalId)
 
@@ -23,6 +25,7 @@ export async function createGoalCompletion({
 
   const { completionsCount, desiredWeeklyFrequency } = await getGoalDetails({
     goalId,
+    timezone,
   })
 
   if (completionsCount >= desiredWeeklyFrequency) {

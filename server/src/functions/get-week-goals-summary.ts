@@ -18,6 +18,7 @@ type GoalsCompletionsPerDayProps = Record<
     completedAt: string
   }[]
 >
+
 interface GetWeekGoalsSummaryProps {
   timezone?: string
   year?: number

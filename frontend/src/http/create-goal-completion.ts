@@ -9,5 +9,12 @@ interface CreateGoalCompletionRequest {
 export async function createGoalCompletion({
   goalId,
 }: CreateGoalCompletionRequest): Promise<void> {
-  await axios.patch(`${config.API_URL}/goals/${goalId}/completion`)
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+  await axios.patch(`${config.API_URL}/goals/${goalId}/completion`, null, {
+    params: { timezone },
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
 }

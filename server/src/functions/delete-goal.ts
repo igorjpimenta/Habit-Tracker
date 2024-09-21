@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { goals } from '../db/schema'
+import { goalCompletions, goals } from '../db/schema'
 import { getGoal } from '../db/queries'
 import { APIError } from '../utils/error-handler'
 
@@ -20,5 +20,6 @@ export async function deleteGoal({ id }: DeleteGoalRequest) {
     )
   }
 
+  await db.delete(goalCompletions).where(eq(goalCompletions.goalId, id))
   await db.delete(goals).where(eq(goals.id, id))
 }

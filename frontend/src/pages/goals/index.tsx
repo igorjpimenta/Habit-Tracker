@@ -1,5 +1,6 @@
 import { Dialog } from '../../components/dialog'
 import { CreateGoalDialog } from './components/create-goal-dialog'
+import { ManageGoalsDialog } from './components/manage-goals-dialog'
 import { EmptyGoals } from './empty-goals'
 import { GoalsSummary } from './goals-summary'
 import { getWeekGoalsSummary } from '../../http/get-week-goals-summary'
@@ -14,7 +15,22 @@ dayjs.extend(customParseFormat)
 dayjs.extend(weekOfYear)
 
 export function Goals() {
-  const [isDialogOpen, setDialogOpen] = useState(false)
+  enum DialogType {
+    NONE = 0,
+    CREATE_GOAL = 1,
+    MANAGE_GOALS = 2,
+  }
+
+  const [openDialog, setOpenDialog] = useState<DialogType>(DialogType.NONE)
+
+  function handleOpenCreateGoalDialog() {
+    setOpenDialog(DialogType.CREATE_GOAL)
+  }
+
+  function handleOpenManageGoalsDialog() {
+    setOpenDialog(DialogType.MANAGE_GOALS)
+  }
+
   const [currentWeek, setCurrentWeek] = useState(dayjs().week())
   const [currentYear, setCurrentYear] = useState(dayjs().year())
 
@@ -24,10 +40,6 @@ export function Goals() {
       getWeekGoalsSummary({ weekOfYear: currentWeek, year: currentYear }),
     staleTime: 1000 * 60,
   })
-
-  function handleCloseDialog() {
-    setDialogOpen(false)
-  }
 
   function handleDecreaseCurrentWeek() {
     if (currentWeek === 1) {
@@ -42,23 +54,34 @@ export function Goals() {
   }
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+    <Dialog
+      open={openDialog !== DialogType.NONE}
+      onOpenChange={() => setOpenDialog(DialogType.NONE)}
+    >
       {summary?.allTimeTotal ? (
         <GoalsSummary
           weekOfYear={currentWeek}
           year={currentYear}
+          onCreateGoalTrigger={handleOpenCreateGoalDialog}
+          onManageGoalsTrigger={handleOpenManageGoalsDialog}
           onWeekDecreasing={handleDecreaseCurrentWeek}
           onWeekIncreasing={handleIncreaseCurrentWeek}
         />
       ) : (
-        <EmptyGoals />
+        <EmptyGoals onCreateGoalTrigger={handleOpenCreateGoalDialog} />
       )}
 
-      <CreateGoalDialog
-        onCreateGoal={handleCloseDialog}
-        weekOfYear={currentWeek}
-        year={currentYear}
-      />
+      {openDialog === DialogType.CREATE_GOAL && (
+        <CreateGoalDialog
+          onSubmit={() => setOpenDialog(DialogType.NONE)}
+          weekOfYear={currentWeek}
+          year={currentYear}
+        />
+      )}
+
+      {openDialog === DialogType.MANAGE_GOALS && (
+        <ManageGoalsDialog weekOfYear={currentWeek} year={currentYear} />
+      )}
     </Dialog>
   )
 }

@@ -1,11 +1,14 @@
 import logo from '../../../assets/logo.svg'
 import letsStart from '../../../assets/lets-start-illustration.svg'
 import { Button } from '../../../components/button'
-import { DialogTrigger } from '../../../components/dialog'
 
 import { Plus } from 'lucide-react'
 
-export function EmptyGoals() {
+interface EmptyGoalsProps {
+  onCreateGoalTrigger: () => void
+}
+
+export function EmptyGoals({ onCreateGoalTrigger }: EmptyGoalsProps) {
   return (
     <div className="h-screen flex flex-col items-center justify-center gap-8">
       <img src={logo} alt="in.orbit logo" />
@@ -17,12 +20,10 @@ export function EmptyGoals() {
         now?
       </p>
 
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="size-4" />
-          Create goal
-        </Button>
-      </DialogTrigger>
+      <Button onClick={onCreateGoalTrigger}>
+        <Plus className="size-4" />
+        Create goal
+      </Button>
     </div>
   )
 }

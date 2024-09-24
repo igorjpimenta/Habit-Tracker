@@ -2,15 +2,20 @@ import { OutlineButton } from '../../../../components/outline-button'
 import { getWeekPendingGoals } from '../../../../http/get-week-pending-goals'
 import { createGoalCompletion } from '../../../../http/create-goal-completion'
 
-import { Plus } from 'lucide-react'
+import { Pen, Plus } from 'lucide-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 interface PendingGoalsProps {
   year: number
   weekOfYear: number
+  onManageGoalsTrigger: () => void
 }
 
-export function PendingGoals({ year, weekOfYear }: PendingGoalsProps) {
+export function PendingGoals({
+  year,
+  weekOfYear,
+  onManageGoalsTrigger,
+}: PendingGoalsProps) {
   const queryClient = useQueryClient()
 
   const { data: pendingGoals } = useQuery({
@@ -42,7 +47,17 @@ export function PendingGoals({ year, weekOfYear }: PendingGoalsProps) {
   })
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="space-y-3 space-x-3 -mt-3 -ml-3">
+      <div className="h-[38px] mt-3 float-right">
+        <button
+          onClick={onManageGoalsTrigger}
+          type="button"
+          className="p-1 text-zinc-500 enabled:hover:text-zinc-400"
+        >
+          <Pen className="size-3.5" />
+        </button>
+      </div>
+
       {sortedPendingGoals.map(goal => {
         const completed = goal.completionCount >= goal.desiredWeeklyFrequency
 
@@ -50,6 +65,7 @@ export function PendingGoals({ year, weekOfYear }: PendingGoalsProps) {
           <OutlineButton
             key={goal.id}
             disabled={completed}
+            className="float-left"
             onClick={() => handleCompleteGoal(goal.id)}
           >
             <Plus className="size-4 text-zinc-400" />

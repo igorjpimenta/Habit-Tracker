@@ -1,5 +1,4 @@
 import { Button } from '../../../components/button'
-import { DialogTrigger } from '../../../components/dialog'
 import { Icon } from '../../../components/icon'
 import { Progress, ProgressIndicator } from '../../../components/progress-bar'
 import { Separator } from '../../../components/separator'
@@ -10,10 +9,15 @@ import { GoalCompletion } from './components/goal-completion'
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import dayjs, { type Dayjs } from 'dayjs'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
+
+dayjs.extend(weekOfYear)
 
 interface GoalsSummaryProps {
   year: number
   weekOfYear: number
+  onCreateGoalTrigger: () => void
+  onManageGoalsTrigger: () => void
   onWeekDecreasing: () => void
   onWeekIncreasing: () => void
 }
@@ -21,6 +25,8 @@ interface GoalsSummaryProps {
 export function GoalsSummary({
   year,
   weekOfYear,
+  onCreateGoalTrigger,
+  onManageGoalsTrigger,
   onWeekDecreasing,
   onWeekIncreasing,
 }: GoalsSummaryProps) {
@@ -100,16 +106,15 @@ export function GoalsSummary({
             </span>
           </div>
 
-          <DialogTrigger asChild>
-            <Button
-              size="sm"
-              disabled={!isCurrentWeek}
-              className="disabled:opacity-0"
-            >
-              <Plus className="size-4" />
-              Create goal
-            </Button>
-          </DialogTrigger>
+          <Button
+            size="sm"
+            disabled={!isCurrentWeek}
+            onClick={onCreateGoalTrigger}
+            className="disabled:opacity-0"
+          >
+            <Plus className="size-4" />
+            Create goal
+          </Button>
         </div>
 
         <button
@@ -143,7 +148,13 @@ export function GoalsSummary({
 
       <Separator />
 
-      {isCurrentWeek && <PendingGoals weekOfYear={weekOfYear} year={year} />}
+      {isCurrentWeek && (
+        <PendingGoals
+          weekOfYear={weekOfYear}
+          year={year}
+          onManageGoalsTrigger={onManageGoalsTrigger}
+        />
+      )}
 
       <div className="flex flex-col gap-6">
         <h2 className="text-xl font-medium">Your week</h2>
@@ -186,8 +197,8 @@ export function GoalsSummary({
                     return (
                       <GoalCompletion
                         key={goalCompletion.id}
-                        completionId={goalCompletion.id}
                         goalId={goalCompletion.goalId}
+                        completionId={goalCompletion.id}
                         title={goalCompletion.title}
                         completedAt={formattedTime}
                         year={year}

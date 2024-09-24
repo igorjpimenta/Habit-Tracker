@@ -28,13 +28,13 @@ const createGoalForm = z.object({
 type CreateGoalForm = z.infer<typeof createGoalForm>
 
 interface CreateGoalDialogProps {
-  onCreateGoal: () => void
+  onSubmit: () => void
   year: number
   weekOfYear: number
 }
 
 export function CreateGoalDialog({
-  onCreateGoal,
+  onSubmit,
   year,
   weekOfYear,
 }: CreateGoalDialogProps) {
@@ -55,7 +55,7 @@ export function CreateGoalDialog({
     queryClient.invalidateQueries({ queryKey: ['pending-goals'] })
 
     reset()
-    onCreateGoal()
+    onSubmit()
   }
 
   return (
@@ -99,7 +99,7 @@ export function CreateGoalDialog({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="title">Which activity?</Label>
+              <Label htmlFor="title">How many times a week?</Label>
 
               <Controller
                 control={control}

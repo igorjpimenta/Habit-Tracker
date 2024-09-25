@@ -1,32 +1,32 @@
 import { db } from '.'
 import { getWeekDateRange } from '../utils/date-utils'
-import { goalCompletions, goals } from './schema'
+import { goalCompletions, goals, goalsChangesHistory } from './schema'
 
 import { and, count, eq, gte, lte, sql } from 'drizzle-orm'
-
-export const goalsCreated = db.$with('goals_created').as(
-  db
-    .select({
-      id: goals.id,
-      title: goals.title,
-      desiredWeeklyFrequency: goals.desiredWeeklyFrequency,
-      createdAt: goals.createdAt,
-    })
-    .from(goals)
-)
 
 export const goalsCreatedUpToWeek = (lastDayOfWeek: Date) =>
   db.$with('goals_created_up_to_week').as(
     db
-      .with(goalsCreated)
       .select({
-        id: goalsCreated.id,
-        title: goalsCreated.title,
-        desiredWeeklyFrequency: goalsCreated.desiredWeeklyFrequency,
-        createdAt: goalsCreated.createdAt,
+        id: goals.id,
+        title: goals.title,
+        desiredWeeklyFrequency: sql /* sql */`
+          coalesce(
+            (
+              select ${goalsChangesHistory.oldValue}::int
+              from ${goalsChangesHistory}
+              where ${goalsChangesHistory.goalId} = ${goals.id.getSQL()}
+                and ${goalsChangesHistory.fieldName} = ${'desired_weekly_frequency'}
+                and ${goalsChangesHistory.createdAt} > ${lastDayOfWeek.toISOString()}
+              order by ${goalsChangesHistory.createdAt}
+              limit 1
+            ), ${goals.desiredWeeklyFrequency}
+          )
+        `.as('desired_weekly_frequency'),
+        createdAt: goals.createdAt,
       })
-      .from(goalsCreated)
-      .where(lte(goalsCreated.createdAt, lastDayOfWeek))
+      .from(goals)
+      .where(lte(goals.createdAt, lastDayOfWeek))
   )
 
 export const goalCompletionsCount = (
@@ -176,22 +176,24 @@ export async function getGoalDetails({
     lastDayOfWeek
   )
 
+  const goalsCreatedUpToWeekQuery = goalsCreatedUpToWeek(lastDayOfWeek)
+
   const [goalDetails] = await db
-    .with(goalCompletionsCountQuery)
+    .with(goalCompletionsCountQuery, goalsCreatedUpToWeekQuery)
     .select({
-      desiredWeeklyFrequency: goals.desiredWeeklyFrequency,
+      desiredWeeklyFrequency: goalsCreatedUpToWeekQuery.desiredWeeklyFrequency,
       completionsCount: sql /*sql*/`
           coalesce(${goalCompletionsCountQuery.completionsCount}, 0)
         `
         .mapWith(Number)
         .as('completion_count'),
     })
-    .from(goals)
+    .from(goalsCreatedUpToWeekQuery)
     .leftJoin(
       goalCompletionsCountQuery,
-      eq(goalCompletionsCountQuery.goalId, goals.id)
+      eq(goalCompletionsCountQuery.goalId, goalsCreatedUpToWeekQuery.id)
     )
-    .where(eq(goals.id, goalId))
+    .where(eq(goalsCreatedUpToWeekQuery.id, goalId))
     .limit(1)
 
   return goalDetails

@@ -2,9 +2,9 @@ import { db } from '../db'
 import {
   goalsCompletedByWeekDay,
   goalsCompletedInWeek,
-  goalsCreated,
   goalsCreatedUpToWeek,
 } from '../db/queries'
+import { goals } from '../db/schema'
 import { getWeekDateRange } from '../utils/date-utils'
 
 import { sql } from 'drizzle-orm'
@@ -53,15 +53,14 @@ export async function getWeekGoalsSummary({
     .with(
       goalsCompletedInWeekQuery,
       goalsCreatedUpToWeekQuery,
-      goalsCompletedByWeekDayQuery,
-      goalsCreated
+      goalsCompletedByWeekDayQuery
     )
     .select({
       allTimeTotal: sql /*sql*/`(
           select coalesce(
-            sum(${goalsCreated.desiredWeeklyFrequency}), 0
+            sum(${goals.desiredWeeklyFrequency}), 0
           )
-          from ${goalsCreated}
+          from ${goals}
         )`.mapWith(Number),
       total: sql /*sql*/`(
           select coalesce(

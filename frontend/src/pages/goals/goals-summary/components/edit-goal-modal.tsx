@@ -2,22 +2,22 @@ import {
   ModalContent,
   ModalDescription,
   ModalTitle,
-} from '../../../components/modal'
+} from '../../../../components/modal'
 import {
   updateGoalForm,
   type UpdateGoalForm,
   type HandleUpdateGoalProps,
 } from './manage-goals-dialog'
-import { Button } from '../../../components/button'
-import { Label } from '../../../components/label'
-import { Input } from '../../../components/input'
+import { Button } from '../../../../components/button'
+import { Label } from '../../../../components/label'
+import { Input } from '../../../../components/input'
 import {
   SelectRoot,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectTrigger,
-} from '../../../components/select'
+} from '../../../../components/select'
 
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -80,7 +80,9 @@ export function EditGoalModal({
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="title">How many times a week?</Label>
+                  <Label htmlFor="desiredWeeklyFrequency">
+                    How many times a week?
+                  </Label>
 
                   <Controller
                     control={control}
@@ -92,7 +94,10 @@ export function EditGoalModal({
                           onValueChange={field.onChange}
                           value={String(field.value)}
                         >
-                          <SelectTrigger placeholder="Desired frequency" />
+                          <SelectTrigger
+                            id="desiredWeeklyFrequency"
+                            placeholder="Desired frequency"
+                          />
 
                           <SelectContent>
                             <SelectGroup>

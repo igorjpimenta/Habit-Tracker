@@ -99,7 +99,9 @@ export function CreateGoalDialog({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="title">How many times a week?</Label>
+              <Label htmlFor="desiredWeeklyFrequency">
+                How many times a week?
+              </Label>
 
               <Controller
                 control={control}
@@ -108,6 +110,7 @@ export function CreateGoalDialog({
                 render={({ field }) => {
                   return (
                     <RadioGroup
+                      id="desiredWeeklyFrequency"
                       onValueChange={field.onChange}
                       value={String(field.value)}
                     >

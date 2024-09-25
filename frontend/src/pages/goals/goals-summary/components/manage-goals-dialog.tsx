@@ -3,13 +3,15 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from '../../../components/dialog'
-import { getWeekPendingGoals } from '../../../http/get-week-pending-goals'
-import { updateGoal } from '../../../http/update-goal'
-import { Modal, ModalTrigger } from '../../../components/modal'
+} from '../../../../components/dialog'
+import { getWeekPendingGoals } from '../../../../http/get-week-pending-goals'
+import { Modal } from '../../../../components/modal'
+import { updateGoal } from '../../../../http/update-goal'
 import { EditGoalModal } from './edit-goal-modal'
+import { deleteGoal } from '../../../../http/delete-goal'
+import { DeleteGoalModal } from './delete-goal-modal'
 
-import { CircleCheck, CircleMinus, CircleX, X } from 'lucide-react'
+import { CircleMinus, CircleX, X } from 'lucide-react'
 import { z } from 'zod'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -30,13 +32,34 @@ export interface HandleUpdateGoalProps extends UpdateGoalForm {
   goalId: string
 }
 
+export interface HandleDeleteGoalProps {
+  goalId: string
+}
+
 export function ManageGoalsDialog({
   year,
   weekOfYear,
 }: ManageGoalsDialogProps) {
+  enum ModalType {
+    NONE = 0,
+    EDIT_GOAL = 1,
+    DELETE_GOAL = 2,
+  }
+
+  const [openModal, setOpenModal] = useState(ModalType.NONE)
+
+  function handleOpenEditGoalModal(goalId: string) {
+    setCurrentGoal(goalId)
+    setOpenModal(ModalType.EDIT_GOAL)
+  }
+
+  function handleOpenDeleteGoalModal(goalId: string) {
+    setCurrentGoal(goalId)
+    setOpenModal(ModalType.DELETE_GOAL)
+  }
+
   const queryClient = useQueryClient()
   const [currentGoal, setCurrentGoal] = useState<string | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const { data: pendingGoals } = useQuery({
     queryKey: ['pending-goals'],
@@ -56,19 +79,32 @@ export function ManageGoalsDialog({
     setCurrentGoal(null)
   }
 
+  function handleCancelDeleting() {
+    setCurrentGoal(null)
+  }
+
   async function handleUpdateGoal({
     goalId,
     title,
     desiredWeeklyFrequency,
   }: HandleUpdateGoalProps) {
     await updateGoal({ goalId, title, desiredWeeklyFrequency })
-    console.log({ goalId, title, desiredWeeklyFrequency })
 
     queryClient.invalidateQueries({ queryKey: ['summary', year, weekOfYear] })
     queryClient.invalidateQueries({ queryKey: ['pending-goals'] })
 
+    setOpenModal(ModalType.NONE)
     setCurrentGoal(null)
-    setIsModalOpen(false)
+  }
+
+  async function handleDeleteGoal({ goalId }: HandleDeleteGoalProps) {
+    await deleteGoal({ goalId })
+
+    queryClient.invalidateQueries({ queryKey: ['summary', year, weekOfYear] })
+    queryClient.invalidateQueries({ queryKey: ['pending-goals'] })
+
+    setOpenModal(ModalType.NONE)
+    setCurrentGoal(null)
   }
 
   return (
@@ -95,13 +131,10 @@ export function ManageGoalsDialog({
             return (
               <Modal
                 key={goal.id}
-                open={currentGoal === goal.id && isModalOpen}
-                onOpenChange={open => {
-                  if (!open) {
-                    setCurrentGoal(null)
-                  }
-
-                  setIsModalOpen(!isModalOpen)
+                open={currentGoal === goal.id && openModal !== ModalType.NONE}
+                onOpenChange={() => {
+                  setOpenModal(ModalType.NONE)
+                  setCurrentGoal(null)
                 }}
               >
                 <div
@@ -111,25 +144,16 @@ export function ManageGoalsDialog({
                 >
                   <div className="flex justify-between gap-1.5 ">
                     <div className="flex min-w-0 flex-1 rounded-full border border-dashed text-zinc-300 border-zinc-800 px-4 group-data-[busy=false]:hover:border-zinc-700 group-data-[active=true]:border-pink-500 group-data-[busy=false]:group-data-[active=false]:cursor-pointer group-data-[busy=true]:group-data-[active=false]:cursor-default group-data-[busy=true]:group-data-[active=false]:opacity-60 focus-visible:ring-4 ring-pink-500/10">
-                      <ModalTrigger
-                        asChild
-                        onClick={e => {
-                          if (currentGoal !== goal.id) {
-                            e.preventDefault()
+                      <div
+                        onMouseUp={() => {
+                          if (currentGoal === null) {
+                            handleOpenEditGoalModal(goal.id)
                           }
                         }}
+                        className="disabled:pointer-events-none flex items-center flex-1 h-[40px] text-sm truncate leading-tight bg-transparent outline-none placeholder-zinc-400 placeholder:font-normal"
                       >
-                        <div
-                          onMouseUp={() => {
-                            if (currentGoal === null) {
-                              setCurrentGoal(goal.id)
-                            }
-                          }}
-                          className="disabled:pointer-events-none flex items-center flex-1 h-[40px] text-sm truncate leading-tight bg-transparent outline-none placeholder-zinc-400 placeholder:font-normal"
-                        >
-                          {goal.title}
-                        </div>
-                      </ModalTrigger>
+                        {goal.title}
+                      </div>
                     </div>
 
                     {goal.id === currentGoal ? (
@@ -144,7 +168,12 @@ export function ManageGoalsDialog({
                       <button
                         type="button"
                         disabled={currentGoal !== null}
-                        className="text-zinc-500 enabled:hover:text-red-500 disabled:opacity-0 opacity-0"
+                        onClick={() => {
+                          if (currentGoal === null) {
+                            handleOpenDeleteGoalModal(goal.id)
+                          }
+                        }}
+                        className="text-zinc-500 enabled:hover:text-red-500 disabled:opacity-40"
                       >
                         <CircleMinus className="size-4 " />
                       </button>
@@ -152,11 +181,21 @@ export function ManageGoalsDialog({
                   </div>
                 </div>
 
-                <EditGoalModal
-                  onSubmit={handleUpdateGoal}
-                  goalId={goal.id}
-                  {...goal}
-                />
+                {openModal === ModalType.EDIT_GOAL && (
+                  <EditGoalModal
+                    onSubmit={handleUpdateGoal}
+                    goalId={goal.id}
+                    {...goal}
+                  />
+                )}
+
+                {openModal === ModalType.DELETE_GOAL && (
+                  <DeleteGoalModal
+                    onSubmit={handleDeleteGoal}
+                    onCancel={handleCancelDeleting}
+                    goalId={goal.id}
+                  />
+                )}
               </Modal>
             )
           })}

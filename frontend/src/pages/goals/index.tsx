@@ -1,6 +1,6 @@
 import { Dialog } from '../../components/dialog'
 import { CreateGoalDialog } from './components/create-goal-dialog'
-import { ManageGoalsDialog } from './components/manage-goals-dialog'
+import { ManageGoalsDialog } from './goals-summary/components/manage-goals-dialog'
 import { EmptyGoals } from './empty-goals'
 import { GoalsSummary } from './goals-summary'
 import { getWeekGoalsSummary } from '../../http/get-week-goals-summary'

@@ -22,7 +22,9 @@ export const goalsCreatedUpToWeek = (lastDayOfWeek: Date) =>
               limit 1
             ), ${goals.desiredWeeklyFrequency}
           )
-        `.as('desired_weekly_frequency'),
+        `
+          .mapWith(Number)
+          .as('desired_weekly_frequency'),
         createdAt: goals.createdAt,
       })
       .from(goals)

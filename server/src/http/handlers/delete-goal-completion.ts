@@ -4,8 +4,8 @@ import type { RouteHandlerMethod } from 'fastify'
 import z from 'zod'
 
 const paramsSchema = z.object({
-  goalId: z.string(),
-  completionId: z.string(),
+  goalId: z.string().uuid(),
+  completionId: z.string().uuid(),
 })
 
 export const handleDeleteGoalCompletion: RouteHandlerMethod = async request => {

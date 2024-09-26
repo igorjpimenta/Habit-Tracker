@@ -42,8 +42,8 @@ export const goalCompletionsCount = (
       .from(goalCompletions)
       .where(
         and(
-          gte(goalCompletions.createdAt, firstDayOfWeek),
-          lte(goalCompletions.createdAt, lastDayOfWeek)
+          gte(goalCompletions.completedAt, firstDayOfWeek),
+          lte(goalCompletions.completedAt, lastDayOfWeek)
         )
       )
       .groupBy(goalCompletions.goalId)
@@ -59,19 +59,16 @@ export const goalsCompletedInWeek = (
         id: goalCompletions.id,
         goalId: goalCompletions.goalId,
         title: goals.title,
-        completedOn: sql /*sql*/`
-          date(${goalCompletions.createdAt})
-        `.as('completed_on'),
         completedAt: sql /*sql*/`
-          ${goalCompletions.createdAt}
+          ${goalCompletions.completedAt}
         `.as('completed_at'),
       })
       .from(goalCompletions)
       .innerJoin(goals, eq(goals.id, goalCompletions.goalId))
       .where(
         and(
-          gte(goalCompletions.createdAt, firstDayOfWeek),
-          lte(goalCompletions.createdAt, lastDayOfWeek)
+          gte(goalCompletions.completedAt, firstDayOfWeek),
+          lte(goalCompletions.completedAt, lastDayOfWeek)
         )
       )
   )
@@ -125,6 +122,7 @@ export async function getGoal(goalId: string) {
       title: goals.title,
       desiredWeeklyFrequency: goals.desiredWeeklyFrequency,
       createdAt: goals.createdAt,
+      updatedAt: goals.updatedAt,
     })
     .from(goals)
     .where(eq(goals.id, goalId))
@@ -138,7 +136,9 @@ export async function getGoalCompletion(goalId: string, completionId: string) {
     .select({
       id: goalCompletions.id,
       goalId: goalCompletions.goalId,
+      completedAt: goalCompletions.completedAt,
       createdAt: goalCompletions.createdAt,
+      updatedAt: goalCompletions.updatedAt,
     })
     .from(goalCompletions)
     .where(

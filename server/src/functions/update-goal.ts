@@ -26,13 +26,6 @@ export async function updateGoal({
     )
   }
 
-  if (!title && !desiredWeeklyFrequency) {
-    throw new APIError(
-      "At least one of 'title' or 'desiredWeeklyFrequency' must be provided.",
-      StatusCodes.BAD_REQUEST
-    )
-  }
-
   await db
     .update(goals)
     .set({

@@ -15,9 +15,9 @@ dayjs.extend(isoWeeksInYear)
 dayjs.extend(isLeapYear)
 
 interface SummaryValidatorProps {
-  timezone?: string | undefined
-  year?: number | undefined
-  weekOfYear?: number | undefined
+  timezone?: string
+  year?: number
+  weekOfYear?: number
 }
 
 export function summaryValidator({
@@ -77,5 +77,22 @@ export function timezoneValidator(timezone: string | undefined) {
         StatusCodes.BAD_REQUEST
       )
     }
+  }
+}
+
+interface UpdateGoalValidatorProps {
+  title?: string
+  desiredWeeklyFrequency?: number
+}
+
+export function updateGoalValidator({
+  title,
+  desiredWeeklyFrequency,
+}: UpdateGoalValidatorProps) {
+  if (!title && !desiredWeeklyFrequency) {
+    throw new APIError(
+      "At least one of 'title' or 'desiredWeeklyFrequency' must be provided.",
+      StatusCodes.BAD_REQUEST
+    )
   }
 }

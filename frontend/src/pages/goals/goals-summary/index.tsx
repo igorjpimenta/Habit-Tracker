@@ -189,18 +189,14 @@ export function GoalsSummary({
 
                 <ul className="flex flex-col gap-3">
                   {sortedGoalsCompletionsByCompletedAt.map(goalCompletion => {
-                    const formattedTime = dayjs(
-                      goalCompletion.completedAt,
-                      'HH:mm:ss'
-                    ).format('h:mma')
-
                     return (
                       <GoalCompletion
                         key={goalCompletion.id}
                         goalId={goalCompletion.goalId}
                         completionId={goalCompletion.id}
                         title={goalCompletion.title}
-                        completedAt={formattedTime}
+                        completedOn={date}
+                        completedAt={goalCompletion.completedAt}
                         year={year}
                         weekOfYear={weekOfYear}
                       />

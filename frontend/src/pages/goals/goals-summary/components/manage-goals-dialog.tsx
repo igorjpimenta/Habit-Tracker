@@ -7,9 +7,9 @@ import {
 import { getWeekPendingGoals } from '../../../../http/get-week-pending-goals'
 import { Modal } from '../../../../components/modal'
 import { updateGoal } from '../../../../http/update-goal'
-import { EditGoalModal } from './edit-goal-modal'
+import { EditGoalModal } from '../modals/edit-goal-modal'
 import { deleteGoal } from '../../../../http/delete-goal'
-import { DeleteGoalModal } from './delete-goal-modal'
+import { DeleteGoalModal } from '../modals/delete-goal-modal'
 
 import { CircleMinus, CircleX, X } from 'lucide-react'
 import { z } from 'zod'
@@ -32,30 +32,26 @@ export interface HandleUpdateGoalProps extends UpdateGoalForm {
   goalId: string
 }
 
-export interface HandleDeleteGoalProps {
-  goalId: string
-}
-
 export function ManageGoalsDialog({
   year,
   weekOfYear,
 }: ManageGoalsDialogProps) {
   enum ModalType {
     NONE = 0,
-    EDIT_GOAL = 1,
-    DELETE_GOAL = 2,
+    EDIT = 1,
+    DELETE = 2,
   }
 
   const [openModal, setOpenModal] = useState(ModalType.NONE)
 
   function handleOpenEditGoalModal(goalId: string) {
     setCurrentGoal(goalId)
-    setOpenModal(ModalType.EDIT_GOAL)
+    setOpenModal(ModalType.EDIT)
   }
 
   function handleOpenDeleteGoalModal(goalId: string) {
     setCurrentGoal(goalId)
-    setOpenModal(ModalType.DELETE_GOAL)
+    setOpenModal(ModalType.DELETE)
   }
 
   const queryClient = useQueryClient()
@@ -79,10 +75,6 @@ export function ManageGoalsDialog({
     setCurrentGoal(null)
   }
 
-  function handleCancelDeleting() {
-    setCurrentGoal(null)
-  }
-
   async function handleUpdateGoal({
     goalId,
     title,
@@ -97,7 +89,7 @@ export function ManageGoalsDialog({
     setCurrentGoal(null)
   }
 
-  async function handleDeleteGoal({ goalId }: HandleDeleteGoalProps) {
+  async function handleDeleteGoal(goalId: string) {
     await deleteGoal({ goalId })
 
     queryClient.invalidateQueries({ queryKey: ['summary', year, weekOfYear] })
@@ -181,20 +173,21 @@ export function ManageGoalsDialog({
                   </div>
                 </div>
 
-                {openModal === ModalType.EDIT_GOAL && (
+                {openModal === ModalType.EDIT && (
                   <EditGoalModal
-                    onSubmit={handleUpdateGoal}
-                    goalId={goal.id}
+                    onSubmit={(title: string, desiredWeeklyFrequency: number) =>
+                      handleUpdateGoal({
+                        goalId: goal.id,
+                        title,
+                        desiredWeeklyFrequency,
+                      })
+                    }
                     {...goal}
                   />
                 )}
 
-                {openModal === ModalType.DELETE_GOAL && (
-                  <DeleteGoalModal
-                    onSubmit={handleDeleteGoal}
-                    onCancel={handleCancelDeleting}
-                    goalId={goal.id}
-                  />
+                {openModal === ModalType.DELETE && (
+                  <DeleteGoalModal onSubmit={() => handleDeleteGoal(goal.id)} />
                 )}
               </Modal>
             )

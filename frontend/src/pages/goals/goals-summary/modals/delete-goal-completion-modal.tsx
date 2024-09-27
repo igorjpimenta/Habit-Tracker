@@ -2,49 +2,39 @@ import {
   ModalContent,
   ModalDescription,
   ModalTitle,
+  ModalTrigger,
 } from '../../../../components/modal'
-import type {
-  HandleDeleteGoalProps,
-  HandleUpdateGoalProps,
-} from './manage-goals-dialog'
 import { Button } from '../../../../components/button'
 
-interface DeleteGoalModalProps
-  extends Omit<HandleUpdateGoalProps, 'desiredWeeklyFrequency' | 'title'> {
-  onSubmit: ({ goalId }: HandleDeleteGoalProps) => Promise<void>
-  onCancel: () => void
+interface DeleteGoalCompletionModalProps {
+  onSubmit: () => void
 }
 
-export function DeleteGoalModal({
-  goalId,
+export function DeleteGoalCompletionModal({
   onSubmit,
-  onCancel,
-}: DeleteGoalModalProps) {
+}: DeleteGoalCompletionModalProps) {
   return (
     <ModalContent>
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <ModalTitle>Delete goal?</ModalTitle>
+            <ModalTitle>Delete goal completion?</ModalTitle>
           </div>
 
           <ModalDescription>This action can't be undone.</ModalDescription>
         </div>
 
         <div className="flex items-center justify-between gap-6">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="flex-1"
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
+          <ModalTrigger asChild>
+            <Button variant="secondary" size="sm" className="flex-1">
+              Cancel
+            </Button>
+          </ModalTrigger>
 
           <Button
             size="sm"
             className="flex-1 bg-red-500 enabled:hover:bg-red-600"
-            onClick={() => onSubmit({ goalId })}
+            onClick={onSubmit}
           >
             Delete
           </Button>

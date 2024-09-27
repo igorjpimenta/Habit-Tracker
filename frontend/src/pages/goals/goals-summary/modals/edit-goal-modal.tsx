@@ -7,7 +7,7 @@ import {
   updateGoalForm,
   type UpdateGoalForm,
   type HandleUpdateGoalProps,
-} from './manage-goals-dialog'
+} from '../components/manage-goals-dialog'
 import { Button } from '../../../../components/button'
 import { Label } from '../../../../components/label'
 import { Input } from '../../../../components/input'
@@ -22,16 +22,11 @@ import {
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-interface EditGoalModalProps extends HandleUpdateGoalProps {
-  onSubmit: ({
-    goalId,
-    title,
-    desiredWeeklyFrequency,
-  }: HandleUpdateGoalProps) => Promise<void>
+interface EditGoalModalProps extends Omit<HandleUpdateGoalProps, 'goalId'> {
+  onSubmit: (title: string, desiredWeeklyFrequency: number) => void
 }
 
 export function EditGoalModal({
-  goalId,
   title,
   desiredWeeklyFrequency,
   onSubmit,
@@ -57,7 +52,7 @@ export function EditGoalModal({
 
             <form
               onSubmit={handleSubmit(data => {
-                onSubmit({ goalId, ...data })
+                onSubmit(data.title, data.desiredWeeklyFrequency)
               })}
               className="flex-1 flex flex-col justify-between gap-4"
             >

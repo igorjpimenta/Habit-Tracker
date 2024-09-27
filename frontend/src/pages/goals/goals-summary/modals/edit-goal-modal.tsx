@@ -3,11 +3,6 @@ import {
   ModalDescription,
   ModalTitle,
 } from '../../../../components/modal'
-import {
-  updateGoalForm,
-  type UpdateGoalForm,
-  type HandleUpdateGoalProps,
-} from '../components/manage-goals-dialog'
 import { Button } from '../../../../components/button'
 import { Label } from '../../../../components/label'
 import { Input } from '../../../../components/input'
@@ -21,8 +16,11 @@ import {
 
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
-interface EditGoalModalProps extends Omit<HandleUpdateGoalProps, 'goalId'> {
+interface EditGoalModalProps {
+  title: string
+  desiredWeeklyFrequency: number
   onSubmit: (title: string, desiredWeeklyFrequency: number) => void
 }
 
@@ -31,6 +29,13 @@ export function EditGoalModal({
   desiredWeeklyFrequency,
   onSubmit,
 }: EditGoalModalProps) {
+  const updateGoalForm = z.object({
+    title: z.string(),
+    desiredWeeklyFrequency: z.coerce.number().int().min(1).max(7),
+  })
+
+  type UpdateGoalForm = z.infer<typeof updateGoalForm>
+
   const { register, control, handleSubmit, formState } =
     useForm<UpdateGoalForm>({
       resolver: zodResolver(updateGoalForm),

@@ -1,6 +1,5 @@
 import { Dialog } from '../../components/dialog'
 import { CreateGoalDialog } from './components/create-goal-dialog'
-import { ManageGoalsDialog } from './goals-summary/components/manage-goals-dialog'
 import { EmptyGoals } from './empty-goals'
 import { GoalsSummary } from './goals-summary'
 import { getWeekGoalsSummary } from '../../http/get-week-goals-summary'
@@ -18,17 +17,12 @@ export function Goals() {
   enum DialogType {
     NONE = 0,
     CREATE_GOAL = 1,
-    MANAGE_GOALS = 2,
   }
 
   const [openDialog, setOpenDialog] = useState<DialogType>(DialogType.NONE)
 
   function handleOpenCreateGoalDialog() {
     setOpenDialog(DialogType.CREATE_GOAL)
-  }
-
-  function handleOpenManageGoalsDialog() {
-    setOpenDialog(DialogType.MANAGE_GOALS)
   }
 
   const [currentWeek, setCurrentWeek] = useState(dayjs().week())
@@ -63,7 +57,6 @@ export function Goals() {
           weekOfYear={currentWeek}
           year={currentYear}
           onCreateGoalTrigger={handleOpenCreateGoalDialog}
-          onManageGoalsTrigger={handleOpenManageGoalsDialog}
           onWeekDecreasing={handleDecreaseCurrentWeek}
           onWeekIncreasing={handleIncreaseCurrentWeek}
         />
@@ -77,10 +70,6 @@ export function Goals() {
           weekOfYear={currentWeek}
           year={currentYear}
         />
-      )}
-
-      {openDialog === DialogType.MANAGE_GOALS && (
-        <ManageGoalsDialog weekOfYear={currentWeek} year={currentYear} />
       )}
     </Dialog>
   )

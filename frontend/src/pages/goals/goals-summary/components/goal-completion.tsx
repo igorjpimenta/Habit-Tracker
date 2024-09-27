@@ -85,7 +85,7 @@ export function GoalCompletion({
         setOpenModal(ModalType.NONE)
       }}
     >
-      <li key={completionId} className="group relative flex items-center gap-2">
+      <li className="group relative flex items-center gap-2">
         <CheckCircle2 className="size-4 text-pink-500" />
 
         <div className="flex flex-wrap gap-2">
